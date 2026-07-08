@@ -13,14 +13,6 @@
         Background="Transparent"
         WindowStartupLocation="CenterScreen">
 
-    <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="0"
-                      ResizeBorderThickness="0"
-                      CornerRadius="16"
-                      GlassFrameThickness="-1"
-                      UseAeroCaptionButtons="False" />
-    </WindowChrome.WindowChrome>
-
     <Window.Resources>
         <!-- Card grouping -->
         <Style x:Key="SettingsCard" TargetType="Border">

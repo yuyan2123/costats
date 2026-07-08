@@ -40,14 +40,11 @@ function Get-DefaultVersion {
     }
 
     [xml]$props = Get-Content -Path $propsPath -Raw
-    $propertyGroups = @($props.Project.PropertyGroup)
-    foreach ($group in $propertyGroups) {
-        if ($group.VersionPrefix) {
-            $candidate = [string]$group.VersionPrefix
-            if (-not [string]::IsNullOrWhiteSpace($candidate)) {
-                return $candidate.Trim()
-            }
-        }
+    # SelectSingleNode (not the PowerShell XML adapter) reliably returns an XmlNode
+    # with a usable InnerText even when the element carries an MSBuild Condition attribute.
+    $node = $props.SelectSingleNode("//VersionPrefix")
+    if ($node -and -not [string]::IsNullOrWhiteSpace($node.InnerText)) {
+        return $node.InnerText.Trim()
     }
 
     return "1.0.0"

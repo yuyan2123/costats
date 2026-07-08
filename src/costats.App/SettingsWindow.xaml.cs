@@ -1,6 +1,5 @@
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Interop;
 using costats.App.ViewModels;
 using costats.Application.Shell;
 
@@ -21,8 +20,9 @@ namespace costats.App
 
         private void OnSourceInitialized(object? sender, EventArgs e)
         {
-            var hwnd = new WindowInteropHelper(this).Handle;
-            _backdropService.ApplyBackdrop(hwnd);
+            // Skip backdrop - we use AllowsTransparency with custom Border for rounded corners.
+            // Applying DWM backdrop creates a conflicting layer with a different corner radius
+            // that shows through as an opaque patch in the corners (same issue as GlassWidgetWindow).
         }
 
         private void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
