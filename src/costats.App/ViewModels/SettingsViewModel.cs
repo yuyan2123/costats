@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using costats.App.Services;
 using costats.App.Services.Updates;
 using costats.Application.Pulse;
 using costats.Application.Security;
@@ -21,6 +22,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     private readonly IPulseOrchestrator _pulseOrchestrator;
     private readonly ICredentialVault _credentialVault;
     private readonly CopilotUsageFetcher _copilotFetcher;
+    private readonly ThemeService _themeService;
     private readonly StartupUpdateCoordinator? _updateCoordinator;
     private readonly IMulticcDiscovery? _multiccDiscovery;
     private const string StartupRegistryKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
@@ -32,6 +34,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         IPulseOrchestrator pulseOrchestrator,
         ICredentialVault credentialVault,
         CopilotUsageFetcher copilotFetcher,
+        ThemeService themeService,
         StartupUpdateCoordinator? updateCoordinator = null,
         IMulticcDiscovery? multiccDiscovery = null)
     {
@@ -40,11 +43,13 @@ public sealed partial class SettingsViewModel : ObservableObject
         _pulseOrchestrator = pulseOrchestrator;
         _credentialVault = credentialVault;
         _copilotFetcher = copilotFetcher;
+        _themeService = themeService;
         _updateCoordinator = updateCoordinator;
         _multiccDiscovery = multiccDiscovery;
 
         refreshMinutes = settings.RefreshMinutes;
         startAtLogin = GetStartupRegistryValue();
+        themeMode = ThemeService.ParseMode(settings.ThemeMode);
 
         multiccDetected = _multiccDiscovery?.IsDetected ?? false;
         multiccEnabled = settings.MulticcEnabled;
@@ -61,6 +66,9 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     [ObservableProperty]
     private bool startAtLogin;
+
+    [ObservableProperty]
+    private AppThemeMode themeMode;
 
     [ObservableProperty]
     private bool isCheckingForUpdates;
@@ -129,12 +137,40 @@ public sealed partial class SettingsViewModel : ObservableObject
         }
     }
 
+    public static IReadOnlyList<ThemeOption> ThemeOptions { get; } = new[]
+    {
+        new ThemeOption(AppThemeMode.Auto, "System"),
+        new ThemeOption(AppThemeMode.Light, "Light"),
+        new ThemeOption(AppThemeMode.Dark, "Dark"),
+    };
+
+    public ThemeOption SelectedThemeOption
+    {
+        get => ThemeOptions.FirstOrDefault(o => o.Mode == ThemeMode) ?? ThemeOptions[0];
+        set
+        {
+            if (value is not null && ThemeMode != value.Mode)
+            {
+                ThemeMode = value.Mode;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     partial void OnRefreshMinutesChanged(int value)
     {
         _settings.RefreshMinutes = value;
         _pulseOrchestrator.UpdateRefreshInterval(TimeSpan.FromMinutes(value));
         _ = SaveSettingsAsync();
         OnPropertyChanged(nameof(SelectedRefreshOption));
+    }
+
+    partial void OnThemeModeChanged(AppThemeMode value)
+    {
+        _settings.ThemeMode = value.ToString();
+        _themeService.SetMode(value);
+        _ = SaveSettingsAsync();
+        OnPropertyChanged(nameof(SelectedThemeOption));
     }
 
     partial void OnStartAtLoginChanged(bool value)
@@ -355,6 +391,11 @@ public sealed partial class SettingsViewModel : ObservableObject
 }
 
 public sealed record RefreshOption(int Minutes, string Label)
+{
+    public override string ToString() => Label;
+}
+
+public sealed record ThemeOption(AppThemeMode Mode, string Label)
 {
     public override string ToString() => Label;
 }

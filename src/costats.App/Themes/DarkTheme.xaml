@@ -1,0 +1,38 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Text -->
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F1EFFA" />
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#C9C6DC" />
+    <SolidColorBrush x:Key="TextMutedBrush" Color="#9B97B5" />
+    <SolidColorBrush x:Key="TextFaintBrush" Color="#78748F" />
+
+    <!-- Structure -->
+    <SolidColorBrush x:Key="DividerBrush" Color="#38334A" />
+    <SolidColorBrush x:Key="TrackBrush" Color="#322D42" />
+    <SolidColorBrush x:Key="AccentBrush" Color="#818CF8" />
+
+    <!-- Surfaces -->
+    <SolidColorBrush x:Key="WidgetBackgroundBrush" Color="#1C1926" />
+    <SolidColorBrush x:Key="SettingsBackgroundBrush" Color="#201D2C" />
+    <SolidColorBrush x:Key="SurfaceBrush" Color="#2A2538" />
+
+    <!-- Overlays (hover/pressed states on buttons) -->
+    <SolidColorBrush x:Key="OverlayHoverBrush" Color="#14FFFFFF" />
+    <SolidColorBrush x:Key="OverlayPressedBrush" Color="#20FFFFFF" />
+    <SolidColorBrush x:Key="ButtonBaseBrush" Color="#0AFFFFFF" />
+
+    <!-- Cost figures (WCAG AA on dark background) -->
+    <SolidColorBrush x:Key="CostTodayAccent" Color="#34D399" />
+    <SolidColorBrush x:Key="CostMonthAccent" Color="#A5B4FC" />
+
+    <!-- Plan chip text (WCAG AA on tinted chip background) -->
+    <SolidColorBrush x:Key="PlanChipCodexText" Color="#34D399" />
+    <SolidColorBrush x:Key="PlanChipClaudeText" Color="#FDBA74" />
+    <SolidColorBrush x:Key="PlanChipCopilotText" Color="#C4B5FD" />
+
+    <!-- Multicc panel hero percentage text -->
+    <SolidColorBrush x:Key="SessionTextBrush" Color="#FBBF24" />
+    <SolidColorBrush x:Key="WeeklyTextBrush" Color="#C4B5FD" />
+
+</ResourceDictionary>

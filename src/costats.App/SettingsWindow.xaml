@@ -22,27 +22,11 @@
     </WindowChrome.WindowChrome>
 
     <Window.Resources>
-        <!-- Light color palette with WCAG AA contrast -->
-        <Color x:Key="BgColor">#F5F3FA</Color>
-        <Color x:Key="TextPrimary">#1E1B2E</Color>
-        <Color x:Key="TextSecondary">#3D3A52</Color>
-        <Color x:Key="TextMuted">#5C5975</Color>
-        <Color x:Key="TextFaint">#6E6B86</Color>
-        <Color x:Key="DividerColor">#D5D2E4</Color>
-        <Color x:Key="AccentColor">#6366F1</Color>
-
-        <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}" />
-        <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}" />
-        <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource TextMuted}" />
-        <SolidColorBrush x:Key="TextFaintBrush" Color="{StaticResource TextFaint}" />
-        <SolidColorBrush x:Key="DividerBrush" Color="{StaticResource DividerColor}" />
-        <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
-
         <!-- ComboBox Style -->
         <Style x:Key="SettingsComboBox" TargetType="ComboBox">
-            <Setter Property="Background" Value="#FFFFFF" />
-            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
-            <Setter Property="BorderBrush" Value="{StaticResource DividerBrush}" />
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Padding" Value="12,8" />
             <Setter Property="FontSize" Value="12" />
@@ -51,7 +35,7 @@
 
         <!-- CheckBox Style -->
         <Style x:Key="SettingsCheckBox" TargetType="CheckBox">
-            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
             <Setter Property="FontSize" Value="12" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Template">
@@ -59,7 +43,7 @@
                     <ControlTemplate TargetType="CheckBox">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <Border x:Name="CheckBorder" Width="20" Height="20" CornerRadius="4"
-                                    Background="#FFFFFF" BorderBrush="{StaticResource DividerBrush}" BorderThickness="1"
+                                    Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="1"
                                     VerticalAlignment="Center">
                                 <Path x:Name="CheckMark" Data="M3,7 L7,11 L13,3" Stroke="White" StrokeThickness="2"
                                       Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -69,12 +53,12 @@
                         </StackPanel>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="CheckBorder" Property="Background" Value="{StaticResource AccentBrush}" />
-                                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                                <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource AccentBrush}" />
+                                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
                                 <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -84,9 +68,9 @@
 
         <!-- Button Style -->
         <Style x:Key="SettingsButton" TargetType="Button">
-            <Setter Property="Background" Value="#0A000000" />
-            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
-            <Setter Property="BorderBrush" Value="{StaticResource DividerBrush}" />
+            <Setter Property="Background" Value="{DynamicResource ButtonBaseBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Padding" Value="16,8" />
             <Setter Property="FontSize" Value="12" />
@@ -102,10 +86,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#14000000" />
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource OverlayHoverBrush}" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#1E000000" />
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource OverlayPressedBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -115,7 +99,7 @@
     </Window.Resources>
 
     <Border CornerRadius="16" BorderBrush="#30A0A0C0" BorderThickness="1"
-            Background="#F5F3FA">
+            Background="{DynamicResource SettingsBackgroundBrush}">
         <Grid Margin="20">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -127,38 +111,50 @@
             <!-- Header -->
             <DockPanel Grid.Row="0" Margin="0,0,0,16">
                 <TextBlock Text="Settings" FontSize="18" FontWeight="SemiBold"
-                           Foreground="{StaticResource TextPrimaryBrush}" DockPanel.Dock="Left" />
+                           Foreground="{DynamicResource TextPrimaryBrush}" DockPanel.Dock="Left" />
                 <Button Content="X" Click="OnCloseClick" DockPanel.Dock="Right"
                         HorizontalAlignment="Right" Width="28" Height="28" Padding="0"
                         Style="{StaticResource SettingsButton}" FontWeight="SemiBold" />
             </DockPanel>
 
             <!-- Divider -->
-            <Border Grid.Row="1" Height="1" Background="{StaticResource DividerBrush}" Margin="0,0,0,16" />
+            <Border Grid.Row="1" Height="1" Background="{DynamicResource DividerBrush}" Margin="0,0,0,16" />
 
             <!-- Settings Content -->
             <StackPanel Grid.Row="2">
 
                 <!-- System Section -->
                 <TextBlock Text="SYSTEM" FontSize="10" FontWeight="SemiBold"
-                           Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,12" />
+                           Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12" />
 
                 <CheckBox IsChecked="{Binding StartAtLogin}" Style="{StaticResource SettingsCheckBox}" Margin="0,0,0,6">
-                    <TextBlock Text="Start at login" FontSize="12" Foreground="{StaticResource TextPrimaryBrush}" />
+                    <TextBlock Text="Start at login" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}" />
                 </CheckBox>
                 <TextBlock Text="Automatically launch costats when Windows starts."
-                           FontSize="11" Foreground="{StaticResource TextFaintBrush}" Margin="30,0,0,16" />
+                           FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="30,0,0,16" />
+
+                <DockPanel Margin="0,0,0,6">
+                    <TextBlock Text="Theme" FontSize="12"
+                               Foreground="{DynamicResource TextPrimaryBrush}" DockPanel.Dock="Left"
+                               VerticalAlignment="Center" />
+                    <ComboBox ItemsSource="{Binding ThemeOptions}"
+                              SelectedItem="{Binding SelectedThemeOption}"
+                              Style="{StaticResource SettingsComboBox}"
+                              DockPanel.Dock="Right" HorizontalAlignment="Right" Width="120" />
+                </DockPanel>
+                <TextBlock Text="&quot;System&quot; follows the Windows light/dark setting."
+                           FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="0,0,0,16" />
 
                 <!-- Divider -->
-                <Border Height="1" Background="{StaticResource DividerBrush}" Margin="0,0,0,16" />
+                <Border Height="1" Background="{DynamicResource DividerBrush}" Margin="0,0,0,16" />
 
                 <!-- Automation Section -->
                 <TextBlock Text="AUTOMATION" FontSize="10" FontWeight="SemiBold"
-                           Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,12" />
+                           Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12" />
 
                 <DockPanel Margin="0,0,0,6">
                     <TextBlock Text="Refresh interval" FontSize="12"
-                               Foreground="{StaticResource TextPrimaryBrush}" DockPanel.Dock="Left"
+                               Foreground="{DynamicResource TextPrimaryBrush}" DockPanel.Dock="Left"
                                VerticalAlignment="Center" />
                     <ComboBox ItemsSource="{Binding RefreshOptions}"
                               SelectedItem="{Binding SelectedRefreshOption}"
@@ -166,14 +162,14 @@
                               DockPanel.Dock="Right" HorizontalAlignment="Right" Width="120" />
                 </DockPanel>
                 <TextBlock Text="How often costats polls for usage data in the background."
-                           FontSize="11" Foreground="{StaticResource TextFaintBrush}" Margin="0,0,0,0" />
+                           FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="0,0,0,0" />
 
                 <!-- Divider -->
-                <Border Height="1" Background="{StaticResource DividerBrush}" Margin="0,16,0,16" />
+                <Border Height="1" Background="{DynamicResource DividerBrush}" Margin="0,16,0,16" />
 
                 <!-- Claude Code / Multicc Section -->
                 <TextBlock Text="CLAUDE CODE" FontSize="10" FontWeight="SemiBold"
-                           Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,12" />
+                           Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12" />
 
                 <!-- Shown when multicc is detected -->
                 <StackPanel>
@@ -189,10 +185,10 @@
                     </StackPanel.Style>
                     <CheckBox IsChecked="{Binding MulticcEnabled}" Style="{StaticResource SettingsCheckBox}" Margin="0,0,0,6">
                         <TextBlock Text="Use multicc profiles" FontSize="12"
-                                   Foreground="{StaticResource TextPrimaryBrush}" />
+                                   Foreground="{DynamicResource TextPrimaryBrush}" />
                     </CheckBox>
                     <TextBlock Text="Automatically detect and display all multicc profiles in the Claude tab."
-                               FontSize="11" Foreground="{StaticResource TextFaintBrush}" Margin="30,0,0,12" />
+                               FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="30,0,0,12" />
 
                     <!-- Profile count info (visible when multicc enabled) -->
                     <StackPanel>
@@ -206,7 +202,7 @@
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <TextBlock FontSize="11" Foreground="{StaticResource TextFaintBrush}" Margin="0,0,0,4">
+                        <TextBlock FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="0,0,0,4">
                             <Run Text="Profiles found:" />
                             <Run Text="{Binding MulticcProfileCount, Mode=OneWay}" FontWeight="SemiBold" />
                         </TextBlock>
@@ -230,27 +226,27 @@
                         </Style>
                     </StackPanel.Style>
                     <TextBlock Text="multicc not detected. Install multicc to manage multiple Claude Code accounts."
-                               FontSize="11" Foreground="{StaticResource TextFaintBrush}" TextWrapping="Wrap" />
+                               FontSize="11" Foreground="{DynamicResource TextFaintBrush}" TextWrapping="Wrap" />
                 </StackPanel>
 
                 <!-- Divider -->
-                <Border Height="1" Background="{StaticResource DividerBrush}" Margin="0,16,0,16" />
+                <Border Height="1" Background="{DynamicResource DividerBrush}" Margin="0,16,0,16" />
 
                 <!-- Copilot Section -->
                 <TextBlock Text="COPILOT" FontSize="10" FontWeight="SemiBold"
-                           Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,12" />
+                           Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12" />
 
                 <CheckBox IsChecked="{Binding CopilotEnabled}" Style="{StaticResource SettingsCheckBox}" Margin="0,0,0,6">
-                    <TextBlock Text="Enable GitHub Copilot usage" FontSize="12" Foreground="{StaticResource TextPrimaryBrush}" />
+                    <TextBlock Text="Enable GitHub Copilot usage" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}" />
                 </CheckBox>
                 <TextBlock Text="Connect a GitHub personal access token to fetch usage data."
-                           FontSize="11" Foreground="{StaticResource TextFaintBrush}" Margin="30,0,0,12" TextWrapping="Wrap" />
+                           FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="30,0,0,12" TextWrapping="Wrap" />
 
-                <TextBlock Text="Personal access token" FontSize="12" Foreground="{StaticResource TextPrimaryBrush}" />
+                <TextBlock Text="Personal access token" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}" />
                 <Grid Margin="0,6,0,8">
                     <PasswordBox x:Name="CopilotTokenBox" Height="28"
                                  IsEnabled="{Binding IsCopilotTokenBusy, Converter={x:Static local:BoolNegationConverter.Instance}}" />
-                    <TextBlock Text="********" FontSize="12" Foreground="{StaticResource TextFaintBrush}" Margin="10,0,10,0"
+                    <TextBlock Text="********" FontSize="12" Foreground="{DynamicResource TextFaintBrush}" Margin="10,0,10,0"
                                HorizontalAlignment="Left" VerticalAlignment="Center" IsHitTestVisible="False">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
@@ -281,15 +277,15 @@
                             DockPanel.Dock="Right" />
                 </DockPanel>
 
-                <TextBlock Text="{Binding CopilotTokenStatus}" FontSize="11" Foreground="{StaticResource TextFaintBrush}"
+                <TextBlock Text="{Binding CopilotTokenStatus}" FontSize="11" Foreground="{DynamicResource TextFaintBrush}"
                            Visibility="{Binding CopilotTokenStatus, Converter={x:Static local:StringToVisibilityConverter.Instance}}" />
 
                 <!-- Divider -->
-                <Border Height="1" Background="{StaticResource DividerBrush}" Margin="0,16,0,16" />
+                <Border Height="1" Background="{DynamicResource DividerBrush}" Margin="0,16,0,16" />
 
                 <!-- Updates Section -->
                 <TextBlock Text="UPDATES" FontSize="10" FontWeight="SemiBold"
-                           Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,12" />
+                           Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12" />
 
                 <DockPanel>
                     <Button Content="Check for updates"
@@ -298,7 +294,7 @@
                             Style="{StaticResource SettingsButton}"
                             DockPanel.Dock="Right" HorizontalAlignment="Right" />
                     <TextBlock Text="{Binding UpdateStatusText}"
-                               FontSize="11" Foreground="{StaticResource TextFaintBrush}"
+                               FontSize="11" Foreground="{DynamicResource TextFaintBrush}"
                                VerticalAlignment="Center"
                                Visibility="{Binding UpdateStatusText, Converter={x:Static local:StringToVisibilityConverter.Instance}}" />
                 </DockPanel>
@@ -307,14 +303,14 @@
 
             <!-- Footer -->
             <StackPanel Grid.Row="3" Margin="0,16,0,0">
-                <Border Height="1" Background="{StaticResource DividerBrush}" Margin="0,0,0,12" />
+                <Border Height="1" Background="{DynamicResource DividerBrush}" Margin="0,0,0,12" />
                 <DockPanel>
                     <TextBlock Text="{Binding Version, StringFormat='v{0}'}"
-                               FontSize="11" Foreground="{StaticResource TextMutedBrush}"
+                               FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
                                DockPanel.Dock="Right" HorizontalAlignment="Right"
                                VerticalAlignment="Center" />
                     <TextBlock Text="Changes are saved automatically."
-                               FontSize="11" Foreground="{StaticResource TextFaintBrush}"
+                               FontSize="11" Foreground="{DynamicResource TextFaintBrush}"
                                DockPanel.Dock="Left" VerticalAlignment="Center" />
                 </DockPanel>
             </StackPanel>

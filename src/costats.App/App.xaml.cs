@@ -291,6 +291,7 @@ namespace costats.App
 
                     services.AddSingleton<ICredentialVault, CredentialVault>();
                     services.AddSingleton<IGlassBackdropService, GlassBackdropService>();
+                    services.AddSingleton<ThemeService>();
 
                     services.AddSingleton<PulseViewModel>();
                     services.AddSingleton<SettingsViewModel>();
@@ -303,6 +304,8 @@ namespace costats.App
                 .Build();
 
             _host.Start();
+
+            _host.Services.GetRequiredService<ThemeService>().Initialize(settings);
 
             var lifetime = _host.Services.GetRequiredService<IHostApplicationLifetime>();
             lifetime.ApplicationStopping.Register(() => Log.Warning("Host is stopping"));

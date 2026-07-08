@@ -26,4 +26,9 @@ public sealed class AppSettings
     /// Whether the GitHub Copilot personal usage provider is enabled.
     /// </summary>
     public bool CopilotEnabled { get; set; } = false;
+
+    /// <summary>
+    /// Theme preference: "Auto" (follow Windows system setting), "Light", or "Dark".
+    /// </summary>
+    public string ThemeMode { get; set; } = "Auto";
 }
