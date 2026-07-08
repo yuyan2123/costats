@@ -22,18 +22,137 @@
     </WindowChrome.WindowChrome>
 
     <Window.Resources>
-        <!-- ComboBox Style -->
+        <!-- Card grouping -->
+        <Style x:Key="SettingsCard" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource ButtonBaseBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="14,12" />
+            <Setter Property="Margin" Value="0,0,0,10" />
+        </Style>
+
+        <Style x:Key="CardHeader" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+            <Setter Property="Margin" Value="0,0,0,10" />
+        </Style>
+
+        <!-- ComboBoxItem -->
+        <Style x:Key="SettingsComboBoxItem" TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="border" Background="Transparent" CornerRadius="6" Padding="10,7" Margin="4,1">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource OverlayHoverBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource AccentBrush}" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ComboBox -->
         <Style x:Key="SettingsComboBox" TargetType="ComboBox">
             <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
             <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="Padding" Value="10,7" />
             <Setter Property="FontSize" Value="12" />
             <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="ItemContainerStyle" Value="{StaticResource SettingsComboBoxItem}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton x:Name="ToggleButton"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          Focusable="False" ClickMode="Press"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border x:Name="border" Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                CornerRadius="8">
+                                            <Path Data="M0,0 L4,4 L8,0" Stroke="{DynamicResource TextMutedBrush}"
+                                                  StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                                  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0" />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="{DynamicResource OverlayHoverBrush}" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <ContentPresenter x:Name="ContentSite" IsHitTestVisible="False"
+                                              Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              Margin="{TemplateBinding Padding}"
+                                              VerticalAlignment="Center" HorizontalAlignment="Left" />
+                            <Popup x:Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
+                                <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource DividerBrush}"
+                                        BorderThickness="1" CornerRadius="8" Margin="0,4,0,0"
+                                        MinWidth="{Binding ActualWidth, ElementName=ToggleButton}">
+                                    <ScrollViewer SnapsToDevicePixels="True" Margin="0,4">
+                                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
-        <!-- CheckBox Style -->
+        <!-- PasswordBox -->
+        <Style x:Key="SettingsPasswordBox" TargetType="PasswordBox">
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="10,7" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Height" Value="34" />
+            <Setter Property="CaretBrush" Value="{DynamicResource TextPrimaryBrush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="PasswordBox">
+                        <Border x:Name="border" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- CheckBox -->
         <Style x:Key="SettingsCheckBox" TargetType="CheckBox">
             <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
             <Setter Property="FontSize" Value="12" />
@@ -66,7 +185,7 @@
             </Setter>
         </Style>
 
-        <!-- Button Style -->
+        <!-- Button -->
         <Style x:Key="SettingsButton" TargetType="Button">
             <Setter Property="Background" Value="{DynamicResource ButtonBaseBrush}" />
             <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
@@ -104,7 +223,8 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
@@ -118,191 +238,308 @@
             </DockPanel>
 
             <!-- Divider -->
-            <Border Grid.Row="1" Height="1" Background="{DynamicResource DividerBrush}" Margin="0,0,0,16" />
+            <Border Grid.Row="1" Height="1" Background="{DynamicResource DividerBrush}" Margin="0,0,0,14" />
 
-            <!-- Settings Content -->
-            <StackPanel Grid.Row="2">
+            <!-- Tab bar -->
+            <Grid Grid.Row="2" Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-                <!-- System Section -->
-                <TextBlock Text="SYSTEM" FontSize="10" FontWeight="SemiBold"
-                           Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12" />
+                <RadioButton Grid.Column="0" GroupName="SettingsTabs" Cursor="Hand"
+                             IsChecked="{Binding SelectedTabIndex, Converter={x:Static local:IndexToBoolConverter.Instance}, ConverterParameter=0}">
+                    <RadioButton.Template>
+                        <ControlTemplate TargetType="RadioButton">
+                            <Border x:Name="TabBorder" Background="Transparent" CornerRadius="8" Padding="0,8">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock x:Name="TabText" Text="General" FontSize="12" FontWeight="Medium"
+                                               HorizontalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
+                                    <Border x:Name="TabIndicator" Height="2" Width="28" CornerRadius="1"
+                                            Background="{DynamicResource AccentBrush}" Margin="0,6,0,0" Opacity="0" />
+                                </StackPanel>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="TabText" Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                    <Setter TargetName="TabIndicator" Property="Opacity" Value="1" />
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="TabBorder" Property="Background" Value="{DynamicResource OverlayHoverBrush}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </RadioButton.Template>
+                </RadioButton>
 
-                <CheckBox IsChecked="{Binding StartAtLogin}" Style="{StaticResource SettingsCheckBox}" Margin="0,0,0,6">
-                    <TextBlock Text="Start at login" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}" />
-                </CheckBox>
-                <TextBlock Text="Automatically launch costats when Windows starts."
-                           FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="30,0,0,16" />
+                <RadioButton Grid.Column="1" GroupName="SettingsTabs" Cursor="Hand"
+                             IsChecked="{Binding SelectedTabIndex, Converter={x:Static local:IndexToBoolConverter.Instance}, ConverterParameter=1}">
+                    <RadioButton.Template>
+                        <ControlTemplate TargetType="RadioButton">
+                            <Border x:Name="TabBorder" Background="Transparent" CornerRadius="8" Padding="0,8">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock x:Name="TabText" Text="Providers" FontSize="12" FontWeight="Medium"
+                                               HorizontalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
+                                    <Border x:Name="TabIndicator" Height="2" Width="28" CornerRadius="1"
+                                            Background="{DynamicResource AccentBrush}" Margin="0,6,0,0" Opacity="0" />
+                                </StackPanel>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="TabText" Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                    <Setter TargetName="TabIndicator" Property="Opacity" Value="1" />
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="TabBorder" Property="Background" Value="{DynamicResource OverlayHoverBrush}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </RadioButton.Template>
+                </RadioButton>
 
-                <DockPanel Margin="0,0,0,6">
-                    <TextBlock Text="Theme" FontSize="12"
-                               Foreground="{DynamicResource TextPrimaryBrush}" DockPanel.Dock="Left"
-                               VerticalAlignment="Center" />
-                    <ComboBox ItemsSource="{Binding ThemeOptions}"
-                              SelectedItem="{Binding SelectedThemeOption}"
-                              Style="{StaticResource SettingsComboBox}"
-                              DockPanel.Dock="Right" HorizontalAlignment="Right" Width="120" />
-                </DockPanel>
-                <TextBlock Text="&quot;System&quot; follows the Windows light/dark setting."
-                           FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="0,0,0,16" />
+                <RadioButton Grid.Column="2" GroupName="SettingsTabs" Cursor="Hand"
+                             IsChecked="{Binding SelectedTabIndex, Converter={x:Static local:IndexToBoolConverter.Instance}, ConverterParameter=2}">
+                    <RadioButton.Template>
+                        <ControlTemplate TargetType="RadioButton">
+                            <Border x:Name="TabBorder" Background="Transparent" CornerRadius="8" Padding="0,8">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock x:Name="TabText" Text="Updates" FontSize="12" FontWeight="Medium"
+                                               HorizontalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
+                                    <Border x:Name="TabIndicator" Height="2" Width="28" CornerRadius="1"
+                                            Background="{DynamicResource AccentBrush}" Margin="0,6,0,0" Opacity="0" />
+                                </StackPanel>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="TabText" Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                    <Setter TargetName="TabIndicator" Property="Opacity" Value="1" />
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="TabBorder" Property="Background" Value="{DynamicResource OverlayHoverBrush}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </RadioButton.Template>
+                </RadioButton>
+            </Grid>
 
-                <!-- Divider -->
-                <Border Height="1" Background="{DynamicResource DividerBrush}" Margin="0,0,0,16" />
+            <!-- Tab content -->
+            <StackPanel Grid.Row="3">
 
-                <!-- Automation Section -->
-                <TextBlock Text="AUTOMATION" FontSize="10" FontWeight="SemiBold"
-                           Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12" />
-
-                <DockPanel Margin="0,0,0,6">
-                    <TextBlock Text="Refresh interval" FontSize="12"
-                               Foreground="{DynamicResource TextPrimaryBrush}" DockPanel.Dock="Left"
-                               VerticalAlignment="Center" />
-                    <ComboBox ItemsSource="{Binding RefreshOptions}"
-                              SelectedItem="{Binding SelectedRefreshOption}"
-                              Style="{StaticResource SettingsComboBox}"
-                              DockPanel.Dock="Right" HorizontalAlignment="Right" Width="120" />
-                </DockPanel>
-                <TextBlock Text="How often costats polls for usage data in the background."
-                           FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="0,0,0,0" />
-
-                <!-- Divider -->
-                <Border Height="1" Background="{DynamicResource DividerBrush}" Margin="0,16,0,16" />
-
-                <!-- Claude Code / Multicc Section -->
-                <TextBlock Text="CLAUDE CODE" FontSize="10" FontWeight="SemiBold"
-                           Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12" />
-
-                <!-- Shown when multicc is detected -->
+                <!-- General -->
                 <StackPanel>
                     <StackPanel.Style>
                         <Style TargetType="StackPanel">
                             <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding MulticcDetected}" Value="True">
+                                <DataTrigger Binding="{Binding SelectedTabIndex}" Value="0">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </StackPanel.Style>
-                    <CheckBox IsChecked="{Binding MulticcEnabled}" Style="{StaticResource SettingsCheckBox}" Margin="0,0,0,6">
-                        <TextBlock Text="Use multicc profiles" FontSize="12"
-                                   Foreground="{DynamicResource TextPrimaryBrush}" />
-                    </CheckBox>
-                    <TextBlock Text="Automatically detect and display all multicc profiles in the Claude tab."
-                               FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="30,0,0,12" />
 
-                    <!-- Profile count info (visible when multicc enabled) -->
-                    <StackPanel>
-                        <StackPanel.Style>
-                            <Style TargetType="StackPanel">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding MulticcEnabled}" Value="True">
-                                        <Setter Property="Visibility" Value="Visible" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </StackPanel.Style>
-                        <TextBlock FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="0,0,0,4">
-                            <Run Text="Profiles found:" />
-                            <Run Text="{Binding MulticcProfileCount, Mode=OneWay}" FontWeight="SemiBold" />
-                        </TextBlock>
-                    </StackPanel>
+                    <Border Style="{StaticResource SettingsCard}">
+                        <StackPanel>
+                            <TextBlock Text="General" Style="{StaticResource CardHeader}" />
 
-                    <!-- Restart message -->
-                    <TextBlock Text="{Binding MulticcRestartMessage}" FontSize="11" Foreground="#F97316" Margin="0,8,0,0"
-                               Visibility="{Binding MulticcRestartMessage, Converter={x:Static local:StringToVisibilityConverter.Instance}}" />
+                            <CheckBox IsChecked="{Binding StartAtLogin}" Style="{StaticResource SettingsCheckBox}" Margin="0,0,0,6">
+                                <TextBlock Text="Start at login" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}" />
+                            </CheckBox>
+                            <TextBlock Text="Automatically launch costats when Windows starts."
+                                       FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="30,0,0,14" TextWrapping="Wrap" />
+
+                            <DockPanel Margin="0,0,0,6">
+                                <TextBlock Text="Theme" FontSize="12"
+                                           Foreground="{DynamicResource TextPrimaryBrush}" DockPanel.Dock="Left"
+                                           VerticalAlignment="Center" />
+                                <ComboBox ItemsSource="{Binding ThemeOptions}"
+                                          SelectedItem="{Binding SelectedThemeOption}"
+                                          Style="{StaticResource SettingsComboBox}"
+                                          DockPanel.Dock="Right" HorizontalAlignment="Right" Width="120" />
+                            </DockPanel>
+                            <TextBlock Text="&quot;System&quot; follows the Windows light/dark setting."
+                                       FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="0,0,0,14" TextWrapping="Wrap" />
+
+                            <DockPanel>
+                                <TextBlock Text="Refresh interval" FontSize="12"
+                                           Foreground="{DynamicResource TextPrimaryBrush}" DockPanel.Dock="Left"
+                                           VerticalAlignment="Center" />
+                                <ComboBox ItemsSource="{Binding RefreshOptions}"
+                                          SelectedItem="{Binding SelectedRefreshOption}"
+                                          Style="{StaticResource SettingsComboBox}"
+                                          DockPanel.Dock="Right" HorizontalAlignment="Right" Width="120" />
+                            </DockPanel>
+                            <TextBlock Text="How often costats polls for usage data in the background."
+                                       FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="0,6,0,0" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
 
-                <!-- Shown when multicc is NOT detected -->
+                <!-- Providers -->
                 <StackPanel>
                     <StackPanel.Style>
                         <Style TargetType="StackPanel">
                             <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding MulticcDetected}" Value="False">
+                                <DataTrigger Binding="{Binding SelectedTabIndex}" Value="1">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </StackPanel.Style>
-                    <TextBlock Text="multicc not detected. Install multicc to manage multiple Claude Code accounts."
-                               FontSize="11" Foreground="{DynamicResource TextFaintBrush}" TextWrapping="Wrap" />
-                </StackPanel>
 
-                <!-- Divider -->
-                <Border Height="1" Background="{DynamicResource DividerBrush}" Margin="0,16,0,16" />
+                    <Border Style="{StaticResource SettingsCard}">
+                        <StackPanel>
+                            <TextBlock Text="Claude Code" Style="{StaticResource CardHeader}" />
 
-                <!-- Copilot Section -->
-                <TextBlock Text="COPILOT" FontSize="10" FontWeight="SemiBold"
-                           Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12" />
-
-                <CheckBox IsChecked="{Binding CopilotEnabled}" Style="{StaticResource SettingsCheckBox}" Margin="0,0,0,6">
-                    <TextBlock Text="Enable GitHub Copilot usage" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}" />
-                </CheckBox>
-                <TextBlock Text="Connect a GitHub personal access token to fetch usage data."
-                           FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="30,0,0,12" TextWrapping="Wrap" />
-
-                <TextBlock Text="Personal access token" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}" />
-                <Grid Margin="0,6,0,8">
-                    <PasswordBox x:Name="CopilotTokenBox" Height="28"
-                                 IsEnabled="{Binding IsCopilotTokenBusy, Converter={x:Static local:BoolNegationConverter.Instance}}" />
-                    <TextBlock Text="********" FontSize="12" Foreground="{DynamicResource TextFaintBrush}" Margin="10,0,10,0"
-                               HorizontalAlignment="Left" VerticalAlignment="Center" IsHitTestVisible="False">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding HasCopilotToken}" Value="True">
-                                        <Setter Property="Visibility" Value="Visible" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding ElementName=CopilotTokenBox, Path=IsKeyboardFocused}" Value="True">
+                            <!-- Shown when multicc is detected -->
+                            <StackPanel>
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
                                         <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                </Grid>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding MulticcDetected}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <CheckBox IsChecked="{Binding MulticcEnabled}" Style="{StaticResource SettingsCheckBox}" Margin="0,0,0,6">
+                                    <TextBlock Text="Use multicc profiles" FontSize="12"
+                                               Foreground="{DynamicResource TextPrimaryBrush}" />
+                                </CheckBox>
+                                <TextBlock Text="Automatically detect and display all multicc profiles in the Claude tab."
+                                           FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="30,0,0,10" TextWrapping="Wrap" />
 
-                <DockPanel Margin="0,0,0,6">
-                    <Button Content="Save token"
-                            Click="OnSaveCopilotTokenClick"
-                            IsEnabled="{Binding IsCopilotTokenBusy, Converter={x:Static local:BoolNegationConverter.Instance}}"
-                            Style="{StaticResource SettingsButton}"
-                            DockPanel.Dock="Left" />
-                    <Button Content="Clear token"
-                            Command="{Binding ClearCopilotTokenCommand}"
-                            IsEnabled="{Binding IsCopilotTokenBusy, Converter={x:Static local:BoolNegationConverter.Instance}}"
-                            Style="{StaticResource SettingsButton}"
-                            DockPanel.Dock="Right" />
-                </DockPanel>
+                                <!-- Profile count info (visible when multicc enabled) -->
+                                <StackPanel>
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding MulticcEnabled}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <TextBlock FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="0,0,0,4">
+                                        <Run Text="Profiles found:" />
+                                        <Run Text="{Binding MulticcProfileCount, Mode=OneWay}" FontWeight="SemiBold" />
+                                    </TextBlock>
+                                </StackPanel>
 
-                <TextBlock Text="{Binding CopilotTokenStatus}" FontSize="11" Foreground="{DynamicResource TextFaintBrush}"
-                           Visibility="{Binding CopilotTokenStatus, Converter={x:Static local:StringToVisibilityConverter.Instance}}" />
+                                <!-- Restart message -->
+                                <TextBlock Text="{Binding MulticcRestartMessage}" FontSize="11" Foreground="#F97316" Margin="0,4,0,0"
+                                           Visibility="{Binding MulticcRestartMessage, Converter={x:Static local:StringToVisibilityConverter.Instance}}" />
+                            </StackPanel>
 
-                <!-- Divider -->
-                <Border Height="1" Background="{DynamicResource DividerBrush}" Margin="0,16,0,16" />
+                            <!-- Shown when multicc is NOT detected -->
+                            <StackPanel>
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding MulticcDetected}" Value="False">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <TextBlock Text="multicc not detected. Install multicc to manage multiple Claude Code accounts."
+                                           FontSize="11" Foreground="{DynamicResource TextFaintBrush}" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
 
-                <!-- Updates Section -->
-                <TextBlock Text="UPDATES" FontSize="10" FontWeight="SemiBold"
-                           Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,12" />
+                    <Border Style="{StaticResource SettingsCard}">
+                        <StackPanel>
+                            <TextBlock Text="GitHub Copilot" Style="{StaticResource CardHeader}" />
 
-                <DockPanel>
-                    <Button Content="Check for updates"
-                            Command="{Binding CheckForUpdatesCommand}"
-                            IsEnabled="{Binding IsCheckingForUpdates, Converter={x:Static local:BoolNegationConverter.Instance}}"
-                            Style="{StaticResource SettingsButton}"
-                            DockPanel.Dock="Right" HorizontalAlignment="Right" />
-                    <TextBlock Text="{Binding UpdateStatusText}"
-                               FontSize="11" Foreground="{DynamicResource TextFaintBrush}"
-                               VerticalAlignment="Center"
-                               Visibility="{Binding UpdateStatusText, Converter={x:Static local:StringToVisibilityConverter.Instance}}" />
-                </DockPanel>
+                            <CheckBox IsChecked="{Binding CopilotEnabled}" Style="{StaticResource SettingsCheckBox}" Margin="0,0,0,6">
+                                <TextBlock Text="Enable GitHub Copilot usage" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}" />
+                            </CheckBox>
+                            <TextBlock Text="Connect a GitHub personal access token to fetch usage data."
+                                       FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="30,0,0,12" TextWrapping="Wrap" />
+
+                            <TextBlock Text="Personal access token" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,6" />
+                            <Grid Margin="0,0,0,10">
+                                <PasswordBox x:Name="CopilotTokenBox" Style="{StaticResource SettingsPasswordBox}"
+                                             IsEnabled="{Binding IsCopilotTokenBusy, Converter={x:Static local:BoolNegationConverter.Instance}}" />
+                                <TextBlock Text="********" FontSize="12" Foreground="{DynamicResource TextFaintBrush}" Margin="10,0,10,0"
+                                           HorizontalAlignment="Left" VerticalAlignment="Center" IsHitTestVisible="False">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding HasCopilotToken}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding ElementName=CopilotTokenBox, Path=IsKeyboardFocused}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
+
+                            <DockPanel Margin="0,0,0,6">
+                                <Button Content="Save token"
+                                        Click="OnSaveCopilotTokenClick"
+                                        IsEnabled="{Binding IsCopilotTokenBusy, Converter={x:Static local:BoolNegationConverter.Instance}}"
+                                        Style="{StaticResource SettingsButton}"
+                                        DockPanel.Dock="Left" />
+                                <Button Content="Clear token"
+                                        Command="{Binding ClearCopilotTokenCommand}"
+                                        IsEnabled="{Binding IsCopilotTokenBusy, Converter={x:Static local:BoolNegationConverter.Instance}}"
+                                        Style="{StaticResource SettingsButton}"
+                                        DockPanel.Dock="Right" />
+                            </DockPanel>
+
+                            <TextBlock Text="{Binding CopilotTokenStatus}" FontSize="11" Foreground="{DynamicResource TextFaintBrush}"
+                                       Visibility="{Binding CopilotTokenStatus, Converter={x:Static local:StringToVisibilityConverter.Instance}}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Updates -->
+                <StackPanel>
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SelectedTabIndex}" Value="2">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+
+                    <Border Style="{StaticResource SettingsCard}">
+                        <StackPanel>
+                            <TextBlock Text="Updates" Style="{StaticResource CardHeader}" />
+                            <DockPanel>
+                                <Button Content="Check for updates"
+                                        Command="{Binding CheckForUpdatesCommand}"
+                                        IsEnabled="{Binding IsCheckingForUpdates, Converter={x:Static local:BoolNegationConverter.Instance}}"
+                                        Style="{StaticResource SettingsButton}"
+                                        DockPanel.Dock="Right" HorizontalAlignment="Right" />
+                                <TextBlock Text="{Binding UpdateStatusText}"
+                                           FontSize="11" Foreground="{DynamicResource TextFaintBrush}"
+                                           VerticalAlignment="Center"
+                                           Visibility="{Binding UpdateStatusText, Converter={x:Static local:StringToVisibilityConverter.Instance}}" />
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
 
             </StackPanel>
 
             <!-- Footer -->
-            <StackPanel Grid.Row="3" Margin="0,16,0,0">
+            <StackPanel Grid.Row="4" Margin="0,4,0,0">
                 <Border Height="1" Background="{DynamicResource DividerBrush}" Margin="0,0,0,12" />
                 <DockPanel>
                     <TextBlock Text="{Binding Version, StringFormat='v{0}'}"

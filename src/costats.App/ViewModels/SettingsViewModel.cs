@@ -62,6 +62,9 @@ public sealed partial class SettingsViewModel : ObservableObject
     }
 
     [ObservableProperty]
+    private int selectedTabIndex;
+
+    [ObservableProperty]
     private int refreshMinutes;
 
     [ObservableProperty]
