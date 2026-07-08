@@ -65,6 +65,13 @@ public sealed partial class ProviderPulseViewModel : ObservableObject
     [ObservableProperty]
     private bool hasExtraUsage;
 
+    // Codex manual reset credits ("reset my limits early")
+    [ObservableProperty]
+    private string resetCreditsText = string.Empty;
+
+    [ObservableProperty]
+    private bool hasResetCredits;
+
     // Cost tracking
     [ObservableProperty]
     private string todayCostText = "--";
@@ -138,6 +145,7 @@ public sealed partial class ProviderPulseViewModel : ObservableObject
         PopulateSessionMetrics(vm, reading);
         PopulateWeekMetrics(vm, reading);
         PopulateExtraUsage(vm, reading);
+        PopulateResetCredits(vm, reading);
         PopulateCostData(vm, reading);
 
         // Set overall status based on the higher of session or week utilization
@@ -253,6 +261,24 @@ public sealed partial class ProviderPulseViewModel : ObservableObject
                 vm.ExtraUsageProgress = 0; // No progress bar for prepaid
                 break;
         }
+    }
+
+    private static void PopulateResetCredits(ProviderPulseViewModel vm, ProviderReading reading)
+    {
+        var resetCredits = reading.Usage?.ResetCredits;
+        if (resetCredits is null || resetCredits.AvailableCount <= 0)
+        {
+            vm.HasResetCredits = false;
+            vm.ResetCreditsText = string.Empty;
+            return;
+        }
+
+        vm.HasResetCredits = true;
+        var count = resetCredits.AvailableCount;
+        var noun = count == 1 ? "reset" : "resets";
+        vm.ResetCreditsText = resetCredits.NextExpiresAt is { } expiresAt
+            ? $"{count} {noun} available · next expires {UsageFormatter.ResetCountdown(expiresAt)}"
+            : $"{count} {noun} available";
     }
 
     private static void PopulateCostData(ProviderPulseViewModel vm, ProviderReading reading)

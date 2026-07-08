@@ -13,6 +13,7 @@ public sealed class CodexLogSource : ISignalSource
 
     private readonly UsageLogScanner _scanner = new();
     private readonly CodexOAuthUsageFetcher _oauthFetcher = new();
+    private readonly CodexResetCreditsFetcher _resetCreditsFetcher = new();
     private readonly ExpenseAnalyzer _expenseAnalyzer = new();
 
     public ProviderProfile Profile => ProviderCatalog.Codex;
@@ -21,14 +22,16 @@ public sealed class CodexLogSource : ISignalSource
     {
         var now = DateTimeOffset.UtcNow;
 
-        // OAuth is a network call - run in parallel with file I/O
+        // OAuth and reset-credits are network calls - run in parallel with file I/O
         var oauthTask = _oauthFetcher.FetchAsync(cancellationToken);
+        var resetCreditsTask = _resetCreditsFetcher.FetchAsync(cancellationToken);
 
         // Log scan and expense analysis both read the same files - run sequentially to halve peak memory
         var logResult = await _scanner.ScanCodexAsync(cancellationToken).ConfigureAwait(false);
         var consumption = await SafeAnalyzeExpenseAsync(cancellationToken).ConfigureAwait(false);
 
         var oauthResult = await oauthTask.ConfigureAwait(false);
+        var resetCredits = await resetCreditsTask.ConfigureAwait(false);
 
         if (oauthResult is null && logResult.SessionTokens == 0 && logResult.WeekTokens == 0)
         {
@@ -106,7 +109,8 @@ public sealed class CodexLogSource : ISignalSource
             SpendingBucket: spendingBucket,
             Consumption: consumption,
             SessionWindow: sessionWindow,
-            WeekWindow: weekWindow);
+            WeekWindow: weekWindow,
+            ResetCredits: resetCredits);
 
         var planText = FormatPlanText(oauthResult?.PlanType);
         var statusSummary = oauthResult is not null

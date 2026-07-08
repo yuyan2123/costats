@@ -10,4 +10,5 @@ public sealed record UsagePulse(
     MonetaryBucket? SpendingBucket,
     ConsumptionDigest? Consumption,
     QuotaWindow? SessionWindow,
-    QuotaWindow? WeekWindow);
+    QuotaWindow? WeekWindow,
+    CodexResetCredits? ResetCredits = null);

@@ -322,6 +322,8 @@
                     </DockPanel>
                     <TextBlock Text="{Binding WeekPaceText}" FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="0,4,0,0"
                                Visibility="{Binding WeekPaceText, Converter={x:Static local:StringToVisibilityConverter.Instance}}" />
+                    <TextBlock Text="{Binding ResetCreditsText}" FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="0,4,0,0"
+                               Visibility="{Binding HasResetCredits, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <TextBlock Margin="0,6,0,0" FontSize="11" Foreground="{DynamicResource TextFaintBrush}" HorizontalAlignment="Right">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
