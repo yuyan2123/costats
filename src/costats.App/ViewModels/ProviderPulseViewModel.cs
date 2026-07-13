@@ -171,6 +171,23 @@ public sealed partial class ProviderPulseViewModel : ObservableObject
             return;
         }
 
+        // Codex dropped the short/session limit on some plans (only a weekly limit remains).
+        // The source signals this with an entirely empty session window; show it as N/A
+        // instead of a misleading 0%.
+        if (vm.ProviderId == "codex"
+            && usage.SessionWindow is null
+            && usage.SessionUsed is null
+            && usage.SessionLimit is null)
+        {
+            vm.SessionProgress = 0;
+            vm.SessionUsageLabel = "N/A";
+            vm.SessionResetText = string.Empty;
+            vm.SessionStatusColor = GetUtilizationColor(0);
+            vm.SessionPercentText = "N/A";
+            vm.SessionPercentColor = GetPercentTextColor(0);
+            return;
+        }
+
         var usedPercent = CalculateUsedPercent(usage.SessionUsed, usage.SessionLimit);
         vm.SessionProgress = usedPercent / 100.0;
         vm.SessionUsageLabel = FormatUsageLabel(usedPercent, usage.SessionUsed);

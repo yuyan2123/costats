@@ -48,6 +48,13 @@ public sealed class CodexLogSource : ISignalSource
         var sessionUsedPercent = oauthResult?.PrimaryUsedPercent;
         var weeklyUsedPercent = oauthResult?.SecondaryUsedPercent;
 
+        // OpenAI removed the 5-hour session limit for some plans: the OAuth call succeeds but
+        // reports no session window. Treat that as "session quota not applicable" (rendered as
+        // N/A) rather than a log-based estimate that would look like a real session limit.
+        var sessionWindowUnavailable = oauthResult is not null
+            && oauthResult.PrimaryUsedPercent is null
+            && oauthResult.PrimaryWindowSeconds is null;
+
         // Get window durations from API or use defaults
         var sessionDuration = oauthResult?.PrimaryWindowSeconds is not null
             ? TimeSpan.FromSeconds(oauthResult.PrimaryWindowSeconds.Value)
@@ -60,7 +67,9 @@ public sealed class CodexLogSource : ISignalSource
         var sessionResetsAt = oauthResult?.PrimaryResetsAt ?? CalculateSessionReset(logResult.SessionStart, now, sessionDuration);
         var weeklyResetsAt = oauthResult?.SecondaryResetsAt ?? CalculateWeeklyReset(now);
 
-        var sessionWindow = new QuotaWindow(sessionDuration, sessionResetsAt);
+        QuotaWindow? sessionWindow = sessionWindowUnavailable
+            ? null
+            : new QuotaWindow(sessionDuration, sessionResetsAt);
         var weekWindow = new QuotaWindow(weekDuration, weeklyResetsAt);
 
         // Use percentage data directly when available
@@ -69,7 +78,13 @@ public sealed class CodexLogSource : ISignalSource
         long? weekUsed;
         long? weekLimit;
 
-        if (sessionUsedPercent is not null)
+        if (sessionWindowUnavailable)
+        {
+            // No session quota to report; the widget shows this as N/A.
+            sessionUsed = null;
+            sessionLimit = null;
+        }
+        else if (sessionUsedPercent is not null)
         {
             // Store percentage directly: used=percentage, limit=100
             sessionUsed = (long)Math.Round(sessionUsedPercent.Value);

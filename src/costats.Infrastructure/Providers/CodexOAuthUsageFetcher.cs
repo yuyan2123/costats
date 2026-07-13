@@ -119,14 +119,12 @@ public sealed class CodexOAuthUsageFetcher : IDisposable
         {
             using var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;
+            if (root.ValueKind != JsonValueKind.Object)
+            {
+                return null;
+            }
 
             string? planType = null;
-            double? primaryUsedPercent = null;
-            DateTimeOffset? primaryResetsAt = null;
-            int? primaryWindowSeconds = null;
-            double? secondaryUsedPercent = null;
-            DateTimeOffset? secondaryResetsAt = null;
-            int? secondaryWindowSeconds = null;
             double? creditBalance = null;
             bool hasCredits = false;
 
@@ -136,46 +134,22 @@ public sealed class CodexOAuthUsageFetcher : IDisposable
                 planType = pt.GetString();
             }
 
-            // Parse rate_limit
-            if (root.TryGetProperty("rate_limit", out var rateLimit))
-            {
-                // Primary window (usually 5-hour/session)
-                if (rateLimit.TryGetProperty("primary_window", out var primary))
-                {
-                    if (primary.TryGetProperty("used_percent", out var up) && up.ValueKind == JsonValueKind.Number)
-                    {
-                        primaryUsedPercent = up.GetDouble();
-                    }
-                    if (primary.TryGetProperty("reset_at", out var ra) && ra.ValueKind == JsonValueKind.Number)
-                    {
-                        primaryResetsAt = DateTimeOffset.FromUnixTimeSeconds(ra.GetInt64());
-                    }
-                    if (primary.TryGetProperty("limit_window_seconds", out var lws) && lws.ValueKind == JsonValueKind.Number)
-                    {
-                        primaryWindowSeconds = lws.GetInt32();
-                    }
-                }
+            // Parse rate_limit.
+            // OpenAI dropped the 5-hour session limit for some plans and now returns the sole
+            // weekly window in "primary_window" with "secondary_window" set to null. Classify each
+            // window by its declared length rather than trusting its position, so the weekly window
+            // always lands in the weekly slot regardless of which field carries it.
+            RateWindow? sessionWindow = null;
+            RateWindow? weeklyWindow = null;
 
-                // Secondary window (usually weekly)
-                if (rateLimit.TryGetProperty("secondary_window", out var secondary))
-                {
-                    if (secondary.TryGetProperty("used_percent", out var up) && up.ValueKind == JsonValueKind.Number)
-                    {
-                        secondaryUsedPercent = up.GetDouble();
-                    }
-                    if (secondary.TryGetProperty("reset_at", out var ra) && ra.ValueKind == JsonValueKind.Number)
-                    {
-                        secondaryResetsAt = DateTimeOffset.FromUnixTimeSeconds(ra.GetInt64());
-                    }
-                    if (secondary.TryGetProperty("limit_window_seconds", out var lws) && lws.ValueKind == JsonValueKind.Number)
-                    {
-                        secondaryWindowSeconds = lws.GetInt32();
-                    }
-                }
+            if (root.TryGetProperty("rate_limit", out var rateLimit) && rateLimit.ValueKind == JsonValueKind.Object)
+            {
+                AssignWindow(ParseWindow(rateLimit, "primary_window"), ref sessionWindow, ref weeklyWindow);
+                AssignWindow(ParseWindow(rateLimit, "secondary_window"), ref sessionWindow, ref weeklyWindow);
             }
 
             // Parse credits
-            if (root.TryGetProperty("credits", out var credits))
+            if (root.TryGetProperty("credits", out var credits) && credits.ValueKind == JsonValueKind.Object)
             {
                 if (credits.TryGetProperty("has_credits", out var hc) && hc.ValueKind == JsonValueKind.True)
                 {
@@ -196,12 +170,12 @@ public sealed class CodexOAuthUsageFetcher : IDisposable
 
             return new CodexOAuthUsageResult(
                 planType,
-                primaryUsedPercent,
-                primaryResetsAt,
-                primaryWindowSeconds,
-                secondaryUsedPercent,
-                secondaryResetsAt,
-                secondaryWindowSeconds,
+                sessionWindow?.UsedPercent,
+                sessionWindow?.ResetsAt,
+                sessionWindow?.WindowSeconds,
+                weeklyWindow?.UsedPercent,
+                weeklyWindow?.ResetsAt,
+                weeklyWindow?.WindowSeconds,
                 hasCredits,
                 creditBalance,
                 DateTimeOffset.UtcNow);
@@ -209,6 +183,77 @@ public sealed class CodexOAuthUsageFetcher : IDisposable
         catch
         {
             return null;
+        }
+    }
+
+    // Session windows are short (hours); the weekly window spans multiple days. Treat anything
+    // at least a day long as the weekly limit.
+    private const int WeeklyWindowThresholdSeconds = 24 * 60 * 60;
+
+    private static RateWindow? ParseWindow(JsonElement rateLimit, string propertyName)
+    {
+        // A missing or null window (e.g. "secondary_window": null) is not an object; skip it
+        // instead of calling TryGetProperty on it, which throws for non-object elements.
+        if (!rateLimit.TryGetProperty(propertyName, out var window) || window.ValueKind != JsonValueKind.Object)
+        {
+            return null;
+        }
+
+        double? usedPercent = null;
+        if (window.TryGetProperty("used_percent", out var up) && up.ValueKind == JsonValueKind.Number)
+        {
+            usedPercent = up.GetDouble();
+        }
+
+        DateTimeOffset? resetsAt = null;
+        if (window.TryGetProperty("reset_at", out var ra) && ra.ValueKind == JsonValueKind.Number)
+        {
+            resetsAt = DateTimeOffset.FromUnixTimeSeconds(ra.GetInt64());
+        }
+
+        int? windowSeconds = null;
+        if (window.TryGetProperty("limit_window_seconds", out var lws) && lws.ValueKind == JsonValueKind.Number && lws.TryGetInt32(out var lwsValue))
+        {
+            windowSeconds = lwsValue;
+        }
+
+        if (usedPercent is null && resetsAt is null && windowSeconds is null)
+        {
+            return null;
+        }
+
+        return new RateWindow(usedPercent, resetsAt, windowSeconds);
+    }
+
+    private static void AssignWindow(RateWindow? window, ref RateWindow? sessionWindow, ref RateWindow? weeklyWindow)
+    {
+        if (window is null)
+        {
+            return;
+        }
+
+        // Route by declared length when available so we do not depend on the API's field ordering.
+        if (window.WindowSeconds is { } seconds)
+        {
+            if (seconds >= WeeklyWindowThresholdSeconds)
+            {
+                weeklyWindow ??= window;
+            }
+            else
+            {
+                sessionWindow ??= window;
+            }
+            return;
+        }
+
+        // Length unknown: fall back to positional order (session first, then weekly).
+        if (sessionWindow is null)
+        {
+            sessionWindow = window;
+        }
+        else
+        {
+            weeklyWindow ??= window;
         }
     }
 
@@ -222,6 +267,11 @@ public sealed class CodexOAuthUsageFetcher : IDisposable
         string? RefreshToken,
         string? AccountId,
         string? IdToken);
+
+    private sealed record RateWindow(
+        double? UsedPercent,
+        DateTimeOffset? ResetsAt,
+        int? WindowSeconds);
 }
 
 public sealed record CodexOAuthUsageResult(
