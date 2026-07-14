@@ -95,4 +95,29 @@
         </Setter>
     </Style>
 
+    <Style TargetType="ToolTip">
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="10,7" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToolTip">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="6" Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="18" ShadowDepth="3" Opacity="0.2" Color="Black" />
+                        </Border.Effect>
+                        <ContentPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>

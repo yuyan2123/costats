@@ -41,6 +41,9 @@
         <!-- Settings icon (gear) -->
         <Geometry x:Key="SettingsIconPath">M19.14,12.94a7.14,7.14,0,0,0,.05-.94,7.14,7.14,0,0,0-.05-.94l2.11-1.65a.5.5,0,0,0,.12-.63l-2-3.46a.5.5,0,0,0-.6-.22l-2.49,1a7.28,7.28,0,0,0-1.63-.94l-.38-2.65A.5.5,0,0,0,13.78,2H10.22a.5.5,0,0,0-.5.42L9.34,5.07a7.28,7.28,0,0,0-1.63.94l-2.49-1a.5.5,0,0,0-.6.22l-2,3.46a.5.5,0,0,0,.12.63L4.85,11.06a7.14,7.14,0,0,0-.05.94,7.14,7.14,0,0,0,.05.94L2.74,14.59a.5.5,0,0,0-.12.63l2,3.46a.5.5,0,0,0,.6.22l2.49-1a7.28,7.28,0,0,0,1.63.94l.38,2.65a.5.5,0,0,0,.5.42h3.56a.5.5,0,0,0,.5-.42l.38-2.65a7.28,7.28,0,0,0,1.63-.94l2.49,1a.5.5,0,0,0,.6-.22l2-3.46a.5.5,0,0,0-.12-.63Zm-7.14,2.6A3.54,3.54,0,1,1,15.54,12,3.54,3.54,0,0,1,12,15.54Z</Geometry>
 
+        <!-- Circle-exclamation icon (outlined) -->
+        <Geometry x:Key="CircleAlertIconPath">M11 15h2v2h-2zm0-8h2v6h-2zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm.01 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z</Geometry>
+
         <!-- Progress bar style -->
         <Style x:Key="UsageProgressBar" TargetType="ProgressBar">
             <Setter Property="Height" Value="8" />
@@ -322,8 +325,17 @@
                     </DockPanel>
                     <TextBlock Text="{Binding WeekPaceText}" FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="0,4,0,0"
                                Visibility="{Binding WeekPaceText, Converter={x:Static local:StringToVisibilityConverter.Instance}}" />
-                    <TextBlock Text="{Binding ResetCreditsText}" FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Margin="0,4,0,0"
-                               Visibility="{Binding HasResetCredits, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0"
+                                Visibility="{Binding HasResetCredits, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <TextBlock Text="{Binding ResetCreditsText}" FontSize="11" Foreground="{DynamicResource TextFaintBrush}" VerticalAlignment="Center" />
+                        <Border Background="Transparent" Margin="4,0,0,0" VerticalAlignment="Center" Cursor="Help"
+                                ToolTip="{Binding ResetCreditsTooltip}"
+                                ToolTipService.InitialShowDelay="100" ToolTipService.ShowDuration="60000"
+                                Visibility="{Binding HasResetCreditsDetail, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <Path Data="{StaticResource CircleAlertIconPath}" Fill="{DynamicResource TextFaintBrush}"
+                                  Stretch="Uniform" Width="12" Height="12" />
+                        </Border>
+                    </StackPanel>
                     <TextBlock Margin="0,6,0,0" FontSize="11" Foreground="{DynamicResource TextFaintBrush}" HorizontalAlignment="Right">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">

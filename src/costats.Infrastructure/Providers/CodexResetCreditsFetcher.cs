@@ -119,7 +119,7 @@ public sealed class CodexResetCreditsFetcher : IDisposable
             }
 
             var availableCount = (int)countEl.GetDouble();
-            DateTimeOffset? nextExpiresAt = null;
+            var expirations = new List<DateTimeOffset>();
 
             if (root.TryGetProperty("credits", out var creditsEl) && creditsEl.ValueKind == JsonValueKind.Array)
             {
@@ -143,14 +143,14 @@ public sealed class CodexResetCreditsFetcher : IDisposable
                         continue;
                     }
 
-                    if (nextExpiresAt is null || expiresAt < nextExpiresAt.Value)
-                    {
-                        nextExpiresAt = expiresAt;
-                    }
+                    expirations.Add(expiresAt);
                 }
             }
 
-            return new CodexResetCredits(availableCount, nextExpiresAt);
+            expirations.Sort();
+            DateTimeOffset? nextExpiresAt = expirations.Count > 0 ? expirations[0] : null;
+
+            return new CodexResetCredits(availableCount, nextExpiresAt, expirations);
         }
         catch
         {

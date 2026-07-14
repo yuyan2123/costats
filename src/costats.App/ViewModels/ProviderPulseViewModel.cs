@@ -72,6 +72,13 @@ public sealed partial class ProviderPulseViewModel : ObservableObject
     [ObservableProperty]
     private bool hasResetCredits;
 
+    // Per-credit expirations shown in the hover tooltip next to the reset credits line
+    [ObservableProperty]
+    private string resetCreditsTooltip = string.Empty;
+
+    [ObservableProperty]
+    private bool hasResetCreditsDetail;
+
     // Cost tracking
     [ObservableProperty]
     private string todayCostText = "--";
@@ -287,6 +294,8 @@ public sealed partial class ProviderPulseViewModel : ObservableObject
         {
             vm.HasResetCredits = false;
             vm.ResetCreditsText = string.Empty;
+            vm.HasResetCreditsDetail = false;
+            vm.ResetCreditsTooltip = string.Empty;
             return;
         }
 
@@ -296,6 +305,19 @@ public sealed partial class ProviderPulseViewModel : ObservableObject
         vm.ResetCreditsText = resetCredits.NextExpiresAt is { } expiresAt
             ? $"{count} {noun} available · next expires {UsageFormatter.ResetCountdown(expiresAt)}"
             : $"{count} {noun} available";
+
+        if (resetCredits.Expirations is { Count: > 0 } expirations)
+        {
+            vm.ResetCreditsTooltip = string.Join(
+                Environment.NewLine,
+                expirations.Select((exp, i) => $"Reset #{i + 1} · expires {UsageFormatter.ResetCountdown(exp)}"));
+            vm.HasResetCreditsDetail = true;
+        }
+        else
+        {
+            vm.ResetCreditsTooltip = string.Empty;
+            vm.HasResetCreditsDetail = false;
+        }
     }
 
     private static void PopulateCostData(ProviderPulseViewModel vm, ProviderReading reading)
